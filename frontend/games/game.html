@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kraunama... — GameVault</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">🎮</div>
+                <div class="logo-text">Game<span>Vault</span></div>
+            </a>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="/">Biblioteka</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="game-hero" id="game-hero">
+        <img id="hero-img" src="" alt="">
+        <div class="game-hero-overlay"></div>
+    </div>
+
+    <main class="game-detail">
+        <a href="/" class="back-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            Grįžti į biblioteką
+        </a>
+
+        <div id="game-content"></div>
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 GameVault. Įvertinimai pagal <a href="https://www.metacritic.com/" target="_blank" rel="noopener">Metacritic</a>.</p>
+    </footer>
+
+    <script>
+    const API = "/api";
+
+    function ratingClass(score) {
+      if (score >= 85) return "high";
+      if (score >= 70) return "medium";
+      return "low";
+    }
+
+    async function loadGame() {
+      const pathParts = window.location.pathname.split("/");
+      const slug = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+
+      try {
+        const res = await fetch(`${API}/games/${slug}`);
+        if (!res.ok) throw new Error("Nerastas");
+        const game = await res.json();
+
+        document.title = `${game.title} — GameVault`;
+
+        document.getElementById("hero-img").src = game.capsule_image;
+        document.getElementById("hero-img").alt = game.title;
+
+        const storeUrl = (game.store_url && String(game.store_url).trim()) || "";
+        const finalP = parseFloat(game.price);
+        const dp = Number(game.discount_percent || 0);
+        const rawBefore = game.price_before_discount;
+        const beforeP =
+          rawBefore != null && rawBefore !== "" ? parseFloat(rawBefore) : null;
+        const hasSale =
+          !game.is_free && dp > 0 && beforeP != null && !Number.isNaN(beforeP);
+
+        let priceClass = game.is_free ? "detail-price free" : "detail-price";
+        if (hasSale) priceClass += " detail-price--sale";
+
+        let priceInner;
+        if (game.is_free) {
+          priceInner = "Nemokamai — atsisiųsti";
+        } else if (hasSale) {
+          priceInner = `<span class="detail-price-stack"><span class="price-was">€${beforeP.toFixed(2)}</span><span class="price-now">€${finalP.toFixed(2)}</span><span class="discount-pill">Nuolaida ${dp}%</span><span class="detail-buy-hint">— pirkti</span></span>`;
+        } else {
+          priceInner = `€${finalP.toFixed(2)} — pirkti`;
+        }
+
+        const priceBtn = storeUrl
+          ? `<a class="${priceClass}" href="${storeUrl}" target="_blank" rel="noopener noreferrer">${priceInner}</a>`
+          : `<span class="${priceClass} detail-price-disabled">${game.is_free ? "Nemokamai" : (hasSale ? `<span class="detail-price-stack"><span class="price-was">€${beforeP.toFixed(2)}</span><span class="price-now">€${finalP.toFixed(2)}</span><span class="discount-pill">Nuolaida ${dp}%</span></span>` : `€${finalP.toFixed(2)}`)}</span>`;
+
+        const paragraphs = game.description
+          .split("\n")
+          .filter(p => p.trim())
+          .map(p => `<p style="margin-top: 1rem;">${p}</p>`)
+          .join("");
+
+        const shots = game.screenshots || [];
+        const reviews = game.reviews || [];
+        const screenshotsHTML = shots
+          .map(s => `<div class="screenshot-item"><img src="${s.image_url}" alt="${s.alt_text || ""}" loading="lazy"></div>`)
+          .join("");
+        const reviewsHTML = reviews
+          .map(
+            (r) => `<div class="review-item">
+              <div class="review-top"><strong>${r.author}</strong><span>${r.rating}/10</span></div>
+              <p>${r.comment || ""}</p>
+            </div>`
+          )
+          .join("");
+
+        document.getElementById("game-content").innerHTML = `
+          <div class="game-detail-header">
+            <h1>${game.title}</h1>
+            <div class="detail-meta">
+              <div class="detail-rating">
+                <div class="rating-badge ${ratingClass(game.metacritic_score)}">${game.metacritic_score}</div>
+                <div class="detail-rating-info">
+                  <span class="label">Metacritic</span>
+                  <span class="value">${game.metacritic_label}</span>
+                </div>
+              </div>
+              ${priceBtn}
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="info-label">Kūrėjas</div>
+              <div class="info-value">${game.developer}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Leidėjas</div>
+              <div class="info-value">${game.publisher}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Išleidimo data</div>
+              <div class="info-value">${game.release_date ? game.release_date.split("T")[0] : ""}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Žanras</div>
+              <div class="info-value">${game.genre}</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">Platformos</div>
+              <div class="info-value">${game.platforms}</div>
+            </div>
+          </div>
+
+          <div class="game-description">
+            <h2>Apie žaidimą</h2>
+            ${paragraphs}
+          </div>
+
+          <div class="screenshots-section">
+            <h2>Nuotraukos</h2>
+            <div class="screenshots-grid">
+              ${screenshotsHTML || '<p class="screenshots-empty">Nuotraukų nėra.</p>'}
+            </div>
+          </div>
+
+          <div class="reviews-section">
+            <h2>Atsiliepimai</h2>
+            <div id="reviews-list">${reviewsHTML || '<p class="screenshots-empty">Atsiliepimų dar nėra.</p>'}</div>
+            <form id="review-form" class="review-form">
+              <input id="review-author" placeholder="Jūsų vardas" required />
+              <input id="review-rating" type="number" min="1" max="10" placeholder="Įvertinimas (1-10)" required />
+              <textarea id="review-comment" placeholder="Komentaras"></textarea>
+              <button type="submit">Pridėti atsiliepimą</button>
+            </form>
+          </div>
+        `;
+
+        document.getElementById("review-form")?.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const author = document.getElementById("review-author").value.trim();
+          const rating = Number(document.getElementById("review-rating").value);
+          const comment = document.getElementById("review-comment").value.trim();
+          const resp = await fetch(`${API}/games/${slug}/reviews`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ author, rating, comment }),
+          });
+          if (resp.ok) {
+            loadGame();
+          } else {
+            alert("Nepavyko išsaugoti atsiliepimo");
+          }
+        });
+      } catch (err) {
+        document.getElementById("game-content").innerHTML =
+          '<p style="color: var(--text-muted); text-align: center; padding: 3rem;">Žaidimas nerastas arba serveris nepasiekiamas.</p>';
+      }
+    }
+
+    loadGame();
+    setTimeout(loadGame, 8000);
+    setInterval(loadGame, 30000);
+    </script>
+</body>
+</html>

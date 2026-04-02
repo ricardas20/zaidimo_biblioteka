@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameVault — Žaidimų Biblioteka</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <a href="/" class="logo">
+                <div class="logo-icon">🎮</div>
+                <div class="logo-text">Game<span>Vault</span></div>
+            </a>
+            <div class="header-right">
+                <nav>
+                    <ul class="nav-links">
+                        <li><a href="/" class="active">Biblioteka</a></li>
+                        <li><a href="#populiarus">Žaidimai</a></li>
+                    </ul>
+                </nav>
+                <div class="header-price-filters" id="header-price-filters" role="group" aria-label="Filtruoti pagal kainą">
+                    <span class="header-filters-label">Rodyti</span>
+                    <button type="button" class="header-filter-pill active" data-price-filter="all">Visi</button>
+                    <button type="button" class="header-filter-pill" data-price-filter="free">Nemokami</button>
+                    <button type="button" class="header-filter-pill" data-price-filter="sale">Su nuolaida</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Žaidimų Biblioteka</h1>
+        <p>Atrask populiariausius žaidimus, peržiūrėk įvertinimus ir kainas vienoje vietoje</p>
+        <div class="stats-bar" id="stats-bar"></div>
+    </section>
+
+    <main class="games-section" id="populiarus">
+        <div class="toolbar">
+            <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="search-input" placeholder="Ieškoti žaidimo...">
+            </div>
+            <div class="sort-box">
+                <select id="sort-select">
+                    <option value="score-desc">Reitingas ↓</option>
+                    <option value="score-asc">Reitingas ↑</option>
+                    <option value="price-asc">Kaina ↑</option>
+                    <option value="price-desc">Kaina ↓</option>
+                    <option value="title-asc">Pavadinimas A-Z</option>
+                    <option value="title-desc">Pavadinimas Z-A</option>
+                    <option value="date-desc">Naujausi</option>
+                    <option value="date-asc">Seniausi</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="genre-filters" id="genre-filters"></div>
+
+        <div class="results-info" id="results-info"></div>
+
+        <div class="games-grid" id="games-grid"></div>
+    </main>
+
+    <button class="back-to-top" id="back-to-top" title="Į viršų">↑</button>
+
+    <footer class="footer">
+        <p>© 2026 GameVault — Žaidimų Biblioteka. Įvertinimai pagal <a href="https://www.metacritic.com/" target="_blank" rel="noopener">Metacritic</a>.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

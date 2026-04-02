@@ -1,0 +1,18 @@
+# Dependencies
+backend/node_modules/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Logs & coverage
+*.log
+npm-debug.log*
+backend/coverage/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

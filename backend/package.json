@@ -1,0 +1,30 @@
+{
+  "name": "gamevault-backend",
+  "version": "1.0.0",
+  "description": "GameVault API - Žaidimų bibliotekos backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed.js",
+    "test": "jest --runInBand",
+    "test:coverage": "jest --runInBand --coverage"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "docx": "^9.6.1",
+    "express": "^4.21.0",
+    "mysql2": "^3.18.2"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "app.js",
+      "utils/**/*.js",
+      "repositories/**/*.js",
+      "patterns/**/*.js"
+    ]
+  }
+}
